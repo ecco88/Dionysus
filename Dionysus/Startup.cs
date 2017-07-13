@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using IdentityServer4.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Dionysus
 {
@@ -21,13 +18,6 @@ namespace Dionysus
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvcCore();
-            services.AddIdentityServer()
-                .AddInMemoryClients(new List<Client>())
-                .AddInMemoryIdentityResources(new List<IdentityResource>())
-                .AddInMemoryApiResources(new List<ApiResource>())
-                .AddTestUsers(new List<IdentityServer4.Test.TestUser>())
-                .AddTemporarySigningCredential();
-
             services.AddMvc();
         }
 
@@ -40,9 +30,20 @@ namespace Dionysus
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationScheme = CookieAuthenticationDefaults.AuthenticationScheme,
+                LoginPath="/Account/LogIn",
+                LogoutPath="/Account/LogOut",
+                AutomaticChallenge=true,
+                AccessDeniedPath="/Account/LogIn",
+                AutomaticAuthenticate = true
+            });
+
+
             app.UseMvcWithDefaultRoute();
-            app.UseIdentityServer();
-                
+
             app.Run(async (context) =>
             {
                 await context.Response.WriteAsync("Hello World!");
