@@ -41,13 +41,7 @@ namespace Dionysus
                 AutomaticAuthenticate = true
             });
 
-
             app.UseMvcWithDefaultRoute();
-
-            app.Run(async (context) =>
-            {
-                await context.Response.WriteAsync("Hello World!");
-            });
         }
 
         public Startup(IHostingEnvironment env)
