@@ -1,0 +1,46 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+   
+}
+
+<div style="width: 400px">
+    <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <th colspan="3">Log In</th>
+            </tr>
+            <tr>
+                <td>Email Address:</td>
+                <td colspan="2"><input type="email" name="Email" /></td>
+            </tr>
+            <tr>
+                <td>Password:</td>
+                <td colspan="2"><input type="password" name="password" /></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <input type="checkbox" id="rememberbox" name="remember" />
+                    <label for="rememberbox">Remember me next time!</label>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <input type="submit" value="Sign In" formaction="LogIn" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>
+                        <a asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]">Register as a new user?</a>
+                    </p>
+                    <p>
+                        <a asp-action="ForgotPassword">Forgot your password?</a>
+                    </p>
+                </td>
+            </tr>
+        </table>
+
+        </form>
+</div>

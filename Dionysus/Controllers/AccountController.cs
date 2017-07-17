@@ -26,10 +26,10 @@ namespace Dionysus.Controllers
         
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> LogIn(string returnUrl = null)
+        public async Task<IActionResult> LogIn(string returnUrl = "/Home")
         {
 
-            await HttpContext.Authentication.SignOutAsync("Dionysus");
+            await HttpContext.Authentication.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
