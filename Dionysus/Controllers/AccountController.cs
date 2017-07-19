@@ -9,6 +9,7 @@ using Dionysus.Services;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Dionysus.Models;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -39,11 +40,12 @@ namespace Dionysus.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LogIn(string email, string password)
         {
-            Dionysus.Models.User user = new Models.User(email, password);
+            Dionysus.Models.User user = await new DAL().LogIn(email, password);
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Email, user.Email)
             };
+
             claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
 
@@ -56,9 +58,27 @@ namespace Dionysus.Controllers
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.Authentication.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), props);
 
-            string returnUrl = ViewBag["ReturnUrl"];
-            return new LocalRedirectResult(returnUrl);
+            string returnUrl = ViewBag.ReturnUrl ?? Url.Action("Index", "Home");
+            return new RedirectResult(returnUrl);
+        }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register(string returnUrl = "/Home")
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(string email, string firstName, string LastName)
+        {
+            Dionysus.Models.User user = await new DAL().Register(firstName, LastName, email);
+           
+            string returnUrl = ViewBag.ReturnUrl ?? Url.Action("Index", "Home");
+            return new RedirectResult(returnUrl);
         }
     }
 }

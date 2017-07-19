@@ -18,7 +18,7 @@ namespace Dionysus
             {
                 result.Email = dr["Email"].ToString();
                 result.FirstName = dr["FirstName"].ToString();
-                result.ID = Convert.ToInt32(dr["UserID"]);
+                result.ID = Convert.ToInt32(dr["ID"]);
                 result.LastName = dr["LastName"].ToString();
                 
             }
@@ -43,32 +43,35 @@ namespace Dionysus
             conn = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename='C:\\Users\\Brian Caputo\\Documents\\Visual Studio 2017\\Projects\\Dionysus\\Dionysus\\Data\\Dionysus.mdf';Integrated Security=True;Connect Timeout=30");
         }
 
-        public async Task<int> Register(string FirstName, string LastName, string Email)
+        public async Task<User> Register(string FirstName, string LastName, string Email)
         {
-            int result = -1;
-            using (DAL dal = new DAL())
-            {
-                command = new SqlCommand("Register", conn);
-                command.CommandType = System.Data.CommandType.StoredProcedure;
-                command.Parameters.AddWithValue("@FirstName", FirstName);
-                command.Parameters.AddWithValue("@LastName", LastName);
-                command.Parameters.AddWithValue("@Email", Email);
-                command.Parameters.AddWithValue("@Password", "password");
-                command.Connection.Open();
-                result = await command.ExecuteNonQueryAsync();
-                command.Connection.Close();
-                return result;
+            User result = new User();
+
+            using (SqlCommand c = new SqlCommand("Register", conn) { CommandType = System.Data.CommandType.StoredProcedure })
+            {                
+                c.Parameters.AddWithValue("@FirstName", FirstName);
+                c.Parameters.AddWithValue("@LastName", LastName);
+                c.Parameters.AddWithValue("@Email", Email);
+                c.Parameters.AddWithValue("@Password", "password");
+                c.Connection.Open();
+                SqlDataReader dr = await c.ExecuteReaderAsync(System.Data.CommandBehavior.CloseConnection);
+                result = await dr.GetMember();
             }
+            return result;
         }
 
         public async Task<Models.User> LogIn(string Email, string password)
         {
-            command = new SqlCommand("LogIn", conn) { CommandType = System.Data.CommandType.StoredProcedure};
-            command.Parameters.AddWithValue("@Email", Email);
-            command.Parameters.AddWithValue("@Password", password);
-            command.Connection.Open();
-            var dr = await command.ExecuteReaderAsync(System.Data.CommandBehavior.CloseConnection);
-            return await dr.GetMember();
+            User result = new User();
+            using (SqlCommand c = new SqlCommand("LogIn", conn) { CommandType = System.Data.CommandType.StoredProcedure })
+            {
+                c.Parameters.AddWithValue("@Email", Email);
+                c.Parameters.AddWithValue("@Password", password);
+                c.Connection.Open();
+                var dr = await c.ExecuteReaderAsync(System.Data.CommandBehavior.CloseConnection);
+                result = await dr.GetMember();
+            }
+            return result;
         }
 
 
